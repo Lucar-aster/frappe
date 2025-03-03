@@ -3,23 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grafico Gantt</title>
+    <title>Grafico Gantt con Tabella</title>
     <!-- Includi la libreria Frappe Gantt tramite CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.5.6/dist/frappe-gantt.css">
     <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.5.6/dist/frappe-gantt.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: row;
+            margin: 0;
+            padding: 0;
         }
-        #gantt-chart {
+        #container {
+            display: flex;
+            flex-direction: row;
             width: 100%;
-            height: 500px;
+        }
+        #table-container {
+            width: 30%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        #gantt-container {
+            width: 70%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
         }
     </style>
 </head>
 <body>
-    <h1>Il mio Grafico Gantt</h1>
-    <div id="gantt-chart"></div>
+    <div id="container">
+        <!-- Tabella a sinistra -->
+        <div id="table-container">
+            <h2>Attività del Progetto</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Inizio</th>
+                        <th>Fine</th>
+                        <th>Progresso</th>
+                    </tr>
+                </thead>
+                <tbody id="task-table-body">
+                    <!-- Le righe della tabella verranno aggiunte dinamicamente -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Grafico Gantt a destra -->
+        <div id="gantt-container">
+            <h1>Grafico Gantt</h1>
+            <div id="gantt-chart"></div>
+        </div>
+    </div>
 
     <script>
         // Dati di esempio per il grafico Gantt
@@ -50,12 +103,30 @@
             }
         ];
 
+        // Funzione per popolare la tabella con i dati delle attività
+        function populateTable() {
+            const tableBody = document.getElementById('task-table-body');
+            tasks.forEach(task => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${task.name}</td>
+                    <td>${task.start}</td>
+                    <td>${task.end}</td>
+                    <td>${task.progress}%</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
         // Crea il grafico Gantt
         var gantt = new Gantt("#gantt-chart", tasks, {
             on_click: function(task) {
                 alert(task.name);
             }
         });
+
+        // Popola la tabella con i dati
+        populateTable();
     </script>
 </body>
 </html>
