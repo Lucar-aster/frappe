@@ -1,38 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Gantt Chart</title>
-    <!-- Includi il CSS di Frappe Gantt dal CDN -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.5.0/dist/frappe-gantt.css">
+    <title>Grafico Gantt</title>
+    <!-- Includi la libreria Frappe Gantt tramite CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.5.6/dist/frappe-gantt.css">
+    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.5.6/dist/frappe-gantt.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #gantt-chart {
+            width: 100%;
+            height: 500px;
+        }
+    </style>
 </head>
 <body>
-    <div id="gantt"></div>
-
-    <!-- Includi il JS di Frappe Gantt dal CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.5.0/dist/frappe-gantt.min.js"></script>
+    <h1>Il mio Grafico Gantt</h1>
+    <div id="gantt-chart"></div>
 
     <script>
-        
+        // Dati di esempio per il grafico Gantt
         var tasks = [
             {
-                id: 'Task 1',
-                name: 'Task 1',
+                id: '1',
+                name: 'Progetto A',
                 start: '2025-03-01',
-                end: '2025-03-05',
-                progress: 50
+                end: '2025-03-10',
+                progress: 50,
+                dependencies: ''
             },
             {
-                id: 'Task 2',
-                name: 'Task 2',
-                start: '2025-03-06',
-                end: '2025-03-10',
-                progress: 20
+                id: '2',
+                name: 'Progetto B',
+                start: '2025-03-05',
+                end: '2025-03-15',
+                progress: 30,
+                dependencies: '1'
+            },
+            {
+                id: '3',
+                name: 'Progetto C',
+                start: '2025-03-12',
+                end: '2025-03-20',
+                progress: 10,
+                dependencies: '2'
             }
         ];
 
-        new Gantt("#gantt", tasks);
+        // Crea il grafico Gantt
+        var gantt = new Gantt("#gantt-chart", tasks, {
+            on_click: function(task) {
+                alert(task.name);
+            }
+        });
     </script>
 </body>
 </html>
