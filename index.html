@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grafico Gantt con Tabella</title>
-    <!-- Includi la libreria Frappe Gantt tramite CDN -->
+    <title>Grafico Gantt con Google Sheets</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.css">
     <script src="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.umd.js"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -49,7 +49,6 @@
 </head>
 <body>
     <div id="container">
-        <!-- Tabella a sinistra -->
         <div id="table-container">
             <h2>Attività del Progetto</h2>
             <table>
@@ -65,9 +64,8 @@
                     <!-- Le righe della tabella verranno aggiunte dinamicamente -->
                 </tbody>
             </table>
+            <button id="add-task">Aggiungi Task</button>
         </div>
-
-        <!-- Grafico Gantt a destra -->
         <div id="gantt-container">
             <h1>Grafico Gantt</h1>
             <div id="gantt-chart"></div>
@@ -75,34 +73,55 @@
     </div>
 
     <script>
-        var tasks = [
-            {
-                id: '1',
-                name: 'Progetto A',
-                start: '2025-03-01',
-                end: '2025-03-10',
-                progress: 50,
-                dependencies: ''
-            },
-            {
-                id: '2',
-                name: 'Progetto B',
-                start: '2025-03-05',
-                end: '2025-03-15',
-                progress: 30,
-                dependencies: '1'
-            },
-            {
-                id: '3',
-                name: 'Progetto C',
-                start: '2025-03-12',
-                end: '2025-03-20',
-                progress: 10,
-                dependencies: '2'
-            }
-        ];
-        function populateTable() {
+        const sheetID = "TUO_SHEET_ID";  // Inserisci qui l'ID del tuo Google Sheet
+        const apiKey = "LA_TUA_API_KEY"; // Inserisci qui la tua API key di Google
+        const sheetName = "Sheet1"; // Assicurati che il nome della sheet corrisponda (se è diverso, cambia qui)
+
+        // Funzione per ottenere i task da Google Sheets
+        async function getTasksFromSheet() {
+            const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${sheetName}?key=${apiKey}`);
+            const data = await response.json();
+            const rows = data.values.slice(1); // Salta la prima riga che contiene le intestazioni
+            return rows.map(row => ({
+                id: row[0],
+                name: row[1],
+                start: row[2],
+                end: row[3],
+                progress: parseInt(row[4], 10),
+            }));
+        }
+
+        // Funzione per aggiungere un nuovo task a Google Sheets
+        async function addTaskToSheet(task) {
+            const body = {
+                values: [[task.id, task.name, task.start, task.end, task.progress]]
+            };
+
+            const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${sheetName}!A1:E1:append?valueInputOption=RAW&key=${apiKey}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            });
+            const result = await response.json();
+            console.log("Task aggiunto:", result);
+        }
+
+        // Funzione per visualizzare i task nel grafico Gantt
+        function renderGantt(tasks) {
+            const gantt = new Gantt("#gantt-chart", tasks, {
+                view_mode: 'Week',
+                on_click: function(task) {
+                    alert(task.name);
+                }
+            });
+        }
+
+        // Funzione per visualizzare i task nella tabella
+        function renderTasks(tasks) {
             const tableBody = document.getElementById('task-table-body');
+            tableBody.innerHTML = ''; // Pulisce la tabella prima di riempirla
             tasks.forEach(task => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -115,15 +134,32 @@
             });
         }
 
-        // Crea il grafico Gantt
-        var gantt = new Gantt("#gantt-chart", tasks, {
-            on_click: function(task) {
-                alert(task.name);
-            }
+        // Aggiungi un nuovo task
+        document.getElementById('add-task').addEventListener('click', () => {
+            const newTask = {
+                id: '4',  // Genera un nuovo ID per il task
+                name: 'Nuovo Task',
+                start: '2025-03-20',
+                end: '2025-03-25',
+                progress: 0
+            };
+            addTaskToSheet(newTask).then(() => {
+                alert("Task aggiunto!");
+                loadTasks(); // Ricarica la lista dei task
+            }).catch(err => {
+                console.error("Errore durante l'aggiunta del task:", err);
+            });
         });
 
-        // Popola la tabella con i dati
-        populateTable();
+        // Carica i task iniziali
+        async function loadTasks() {
+            const tasks = await getTasksFromSheet();
+            renderTasks(tasks);
+            renderGantt(tasks);
+        }
+
+        // Carica i task dal foglio di calcolo
+        loadTasks();
     </script>
 </body>
 </html>
