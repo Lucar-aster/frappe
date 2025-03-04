@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grafico Gantt con Tabella</title>
     <!-- Includi la libreria Frappe Gantt tramite CDN -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.5.6/dist/frappe-gantt.css">
-    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.5.6/dist/frappe-gantt.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.css">
+    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.umd.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -75,7 +75,6 @@
     </div>
 
     <script>
-        // Dati di esempio per il grafico Gantt
         var tasks = [
             {
                 id: '1',
@@ -102,8 +101,6 @@
                 dependencies: '2'
             }
         ];
-
-        // Funzione per popolare la tabella con i dati delle attività
         function populateTable() {
             const tableBody = document.getElementById('task-table-body');
             tasks.forEach(task => {
